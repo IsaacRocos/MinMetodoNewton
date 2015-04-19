@@ -24,38 +24,75 @@ class MetodoNewtonMin(object):
         self.jacobiano = self.generarJacobiano()
 
     def RUN(self):
+        print("------------------------------------------")
         print("ALGORITMO DE NEWTON PARA ENCONTRAR MINIMOS")
-        print("Numero de varaibles:",self.numVar,"Alpha:",self.alpha,"Epsilon:",self.epsilon,"MAX_ITER:",self.MAX_ITER)
-        print("Generando primer solucion - X(0) ... ")
+        print("------------------------------------------")
+        print '|Numero de varaibles(d):',self.numVar,' Alpha:',self.alpha,' Epsilon:',self.epsilon,' MAX_ITER:',self.MAX_ITER,'|'
+        print "Jacobiano:",self.jacobiano
+        print "Generando primer solucion aleatoriamente - X(0) ... "
         x0 = self.generaSolAleatoria(-100,100)
-        print("x0 =",x0)
+        print "x0 =",x0
+        valPendienteFunc = self.obtenerPendienteSolucion(x0)
+        
+        print "Proceso iniciado..."
+        solAnterior = x0
+        ITER = 0
+        while ((valPendienteFunc > self.epsilon)  or  (self.MAX_ITER >= ITER)):
+            Xj = self.generarNuevaSol(solAnterior)
+            print "Nueva solucion:",Xj
+            valPendienteFunc = self.obtenerPendienteSolucion(Xj)
+            ITER = ITER+1 
+        print "Proceso finalizado."
 
+    def generarJacobiano(self): 
+        #print("Calculando jacobiano de funcion...")
+        x1 = Symbol('x1')
+        x2 = Symbol('x2')
+        Fx1x2 = Matrix([(x1**4) - (16*(x1**2)) + (5*(x1))  ,  (x2**4) - (16*(x2**2)) + (5*(x2))])
+        variables = Matrix([x1, x2])
+        jacobiano = Fx1x2.jacobian(variables)
+        #tipo = type(jacobiano)
+        #print("Jacobiano. Type:",tipo,"Resultado:",jacobiano)
+        #print("Resultado Jacobiano:",jacobiano)
+        return jacobiano
+    
     def generaSolAleatoria(self,li,ls):
         solucionInic = []
         for i in range(self.numVar):
             solucionInic.append(random.randrange(li,ls,1))
         return solucionInic
     
-    def generarJacobiano(self): 
-        print("Inicio prueba jacob")
-        x1 = Symbol('x1')
-        x2 = Symbol('x2')
-        Fx1x2 = Matrix([(x1**4) - (16*(x1**2)) + (5*(x1))  ,  (x2**4) - (16*(x2**2)) + (5*(x2))])
-        variables = Matrix([x1, x2])
-        jacobiano = Fx1x2.jacobian(variables)
-        tipo = type(jacobiano)
-        #print("Jacobiano. Type:",tipo,"Resultado:",jacobiano)
-        print("Resultado Jacobiano:",jacobiano)
-        print("Fin prueba jacob")
-        return jacobiano
-
+    def obtenerPendienteSolucion(self,solucion):
+        # Obtener valor de la derivada de la funcion, si el valor resultante es menor que self.Epsilon, la solucion es valida
+        x1 = solucion[0]
+        x2 = solucion[1]
+        x1p = (4*(x1)^3) - (32*(x1)) + 5
+        x2p = (4*(x2)^3) - (32*(x2)) + 5
+        fxpend = 0.5 * (x1p + x2p)
+        return abs(fxpend)
+        
+        
+    def generarNuevaSol(self,solAnterior):
+        nuevaSol = []
+        nuevaSol.append(self.evaluarDerivadaParcial(0,"x1",solAnterior[0]))
+        nuevaSol.append(self.evaluarDerivadaParcial(3,"x2",solAnterior[1]))
+        return nuevaSol
+        
+        
+    def evaluarDerivadaParcial(self,locDParcial,variable,valor):
+        valor = self.jacobiano[locDParcial].evalf(subs={variable:valor})
+        #print (valor)
+        return valor
+        
+    
 minimizar = MetodoNewtonMin()
 minimizar.RUN()
 #minimizar.probarJacobiano()
 
 
-
 '''
     Ejemplo de calculo jacobiano
+    http://docs.sympy.org/latest/modules/matrices/matrices.html?highlight=jacobian#sympy.matrices.matrices.MatrixBase.jacobian
     http://nullege.com/codes/search/sympy.Matrix.jacobian
+    http://stackoverflow.com/questions/7006626/how-to-calculate-expression-using-sympy-in-python
 '''

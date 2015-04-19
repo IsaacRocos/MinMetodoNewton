@@ -16,8 +16,8 @@ class MetodoNewtonMin(object):
     Constructor
     '''
     def __init__(self):
-        self.alpha = 0.003
-        self.epsilon = 0.001
+        self.alpha = 0.00001
+        self.epsilon = 0.00000000000000001
         self.MAX_ITER= 10000
         self.numVar = 2
         self.mejoresSoluciones = []
@@ -39,9 +39,9 @@ class MetodoNewtonMin(object):
         ITER = 0
         while ((valPendienteFunc > self.epsilon)  or  (self.MAX_ITER >= ITER)):
             Xj = self.generarNuevaSol(solAnterior)
-            print "Nueva solucion:",Xj
             valPendienteFunc = self.obtenerPendienteSolucion(Xj)
-            print "Pendiente:",valPendienteFunc
+            if ITER % 100 == 0:
+                print "|Nueva solucion|:",Xj," |Pendiente|:",valPendienteFunc
             ITER = ITER+1 
             solAnterior = Xj
         print "Proceso finalizado."

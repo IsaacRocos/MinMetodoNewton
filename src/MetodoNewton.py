@@ -16,8 +16,8 @@ class MetodoNewtonMin(object):
     Constructor
     '''
     def __init__(self):
-        self.alpha = 0.00001
-        self.epsilon = 0.00000000000000001
+        self.alpha = 0.003
+        self.epsilon = 0.000000000001
         self.MAX_ITER= 10000
         self.numVar = 2
         self.mejoresSoluciones = []
@@ -40,8 +40,11 @@ class MetodoNewtonMin(object):
         while ((valPendienteFunc > self.epsilon)  or  (self.MAX_ITER >= ITER)):
             Xj = self.generarNuevaSol(solAnterior)
             valPendienteFunc = self.obtenerPendienteSolucion(Xj)
-            if ITER % 100 == 0:
-                print "|Nueva solucion|:",Xj," |Pendiente|:",valPendienteFunc
+            valAptitudSolucion = self.obtenerAptitudSolucion(Xj) 
+            if valPendienteFunc <1:
+                self.alpha = self.alpha = 0.000001
+            if ITER % 150 == 0:
+                print "|Nueva solucion| F(x1,x2) =",valAptitudSolucion,"en X* =",Xj," |Pendiente|:",valPendienteFunc
             ITER = ITER+1 
             solAnterior = Xj
         print "Proceso finalizado."
@@ -73,7 +76,16 @@ class MetodoNewtonMin(object):
         fxpend = 0.5 * (x1p + x2p)
         return abs(fxpend)
         
-        
+    
+    def obtenerAptitudSolucion(self,solucion):
+        # Obtener valor de la derivada de la funcion, si el valor resultante es menor que self.Epsilon, la solucion es valida
+        x1 = solucion[0]
+        x2 = solucion[1]
+        sx1 = ((x1)**4) - (16*(x1)**2) + (5*(x1))
+        sx2 = ((x2)**4) - (16*(x2)**2) + (5*(x2))
+        fx = 0.5 * (sx1 + sx2)
+        return fx
+    
     def generarNuevaSol(self,solAnterior):
         nuevaSol = []
         xj0 = solAnterior[0] - (self.alpha * self.evaluarDerivadaParcial(0,"x1",solAnterior[0]))

@@ -16,7 +16,7 @@ class MetodoNewtonMin(object):
     Constructor
     '''
     def __init__(self):
-        self.alpha = 0.3
+        self.alpha = 0.003
         self.epsilon = 0.001
         self.MAX_ITER= 10000
         self.numVar = 2
@@ -30,7 +30,7 @@ class MetodoNewtonMin(object):
         print '|Numero de varaibles(d):',self.numVar,' Alpha:',self.alpha,' Epsilon:',self.epsilon,' MAX_ITER:',self.MAX_ITER,'|'
         print "Jacobiano:",self.jacobiano
         print "Generando primer solucion aleatoriamente - X(0) ... "
-        x0 = self.generaSolAleatoria(-100,100)
+        x0 = self.generaSolAleatoria(-10,10)
         print "x0 =",x0
         valPendienteFunc = self.obtenerPendienteSolucion(x0)
         
@@ -41,7 +41,9 @@ class MetodoNewtonMin(object):
             Xj = self.generarNuevaSol(solAnterior)
             print "Nueva solucion:",Xj
             valPendienteFunc = self.obtenerPendienteSolucion(Xj)
+            print "Pendiente:",valPendienteFunc
             ITER = ITER+1 
+            solAnterior = Xj
         print "Proceso finalizado."
 
     def generarJacobiano(self): 
@@ -66,16 +68,18 @@ class MetodoNewtonMin(object):
         # Obtener valor de la derivada de la funcion, si el valor resultante es menor que self.Epsilon, la solucion es valida
         x1 = solucion[0]
         x2 = solucion[1]
-        x1p = (4*(x1)^3) - (32*(x1)) + 5
-        x2p = (4*(x2)^3) - (32*(x2)) + 5
+        x1p = (4*(x1)**3) - (32*(x1)) + 5
+        x2p = (4*(x2)**3) - (32*(x2)) + 5
         fxpend = 0.5 * (x1p + x2p)
         return abs(fxpend)
         
         
     def generarNuevaSol(self,solAnterior):
         nuevaSol = []
-        nuevaSol.append(self.evaluarDerivadaParcial(0,"x1",solAnterior[0]))
-        nuevaSol.append(self.evaluarDerivadaParcial(3,"x2",solAnterior[1]))
+        xj0 = solAnterior[0] - (self.alpha * self.evaluarDerivadaParcial(0,"x1",solAnterior[0]))
+        xj1 = solAnterior[1] - (self.alpha * self.evaluarDerivadaParcial(3,"x2",solAnterior[1]))
+        nuevaSol.append(xj0)
+        nuevaSol.append(xj1)
         return nuevaSol
         
         

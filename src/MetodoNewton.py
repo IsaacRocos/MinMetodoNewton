@@ -16,9 +16,9 @@ class MetodoNewtonMin(object):
     Constructor
     '''
     def __init__(self):
-        self.alpha = 0.003
-        self.epsilon = 0.000000000001
-        self.MAX_ITER= 10000
+        self.alpha = 0.000005
+        self.epsilon = 0.00010
+        self.MAX_ITER= 1000000
         self.numVar = 2
         self.mejoresSoluciones = []
         self.jacobiano = self.generarJacobiano()
@@ -30,24 +30,27 @@ class MetodoNewtonMin(object):
         print '|Numero de varaibles(d):',self.numVar,' Alpha:',self.alpha,' Epsilon:',self.epsilon,' MAX_ITER:',self.MAX_ITER,'|'
         print "Jacobiano:",self.jacobiano
         print "Generando primer solucion aleatoriamente - X(0) ... "
-        x0 = self.generaSolAleatoria(-10,10)
+        x0 = self.generaSolAleatoria(-100,100)
         print "x0 =",x0
         valPendienteFunc = self.obtenerPendienteSolucion(x0)
         
         print "Proceso iniciado..."
         solAnterior = x0
+        Xj = []
         ITER = 0
-        while ((valPendienteFunc > self.epsilon)  or  (self.MAX_ITER >= ITER)):
+        while ((valPendienteFunc > self.epsilon)  and  (self.MAX_ITER >= ITER)):
             Xj = self.generarNuevaSol(solAnterior)
             valPendienteFunc = self.obtenerPendienteSolucion(Xj)
             valAptitudSolucion = self.obtenerAptitudSolucion(Xj) 
-            if valPendienteFunc <1:
-                self.alpha = self.alpha = 0.000001
+            
             if ITER % 150 == 0:
                 print "|Nueva solucion| F(x1,x2) =",valAptitudSolucion,"en X* =",Xj," |Pendiente|:",valPendienteFunc
             ITER = ITER+1 
             solAnterior = Xj
         print "Proceso finalizado."
+        print "Mejor solucion encontrada:"
+        print "F(x1,x2) =",valAptitudSolucion,"en X* =",Xj," |Pendiente|:",valPendienteFunc
+        
 
     def generarJacobiano(self): 
         #print("Calculando jacobiano de funcion...")
@@ -64,7 +67,7 @@ class MetodoNewtonMin(object):
     def generaSolAleatoria(self,li,ls):
         solucionInic = []
         for i in range(self.numVar):
-            solucionInic.append(random.randrange(li,ls,1))
+            solucionInic.append(random.uniform(li,ls))
         return solucionInic
     
     def obtenerPendienteSolucion(self,solucion):
